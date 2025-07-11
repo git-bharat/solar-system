@@ -11,7 +11,13 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '/')));
 app.use(cors())
 
-mongoose.connect(process.env.MONGO_URI, {
+
+// MongoDB Connection// Ensure you have set the environment variables MONGO_URI, MONGO_USERNAME, and MONGO_PASSWORD
+if (!process.env.MONGO_URI || !process.env.MONGO_USERNAME || !process.env.MONGO_PASSWORD) {
+    console.error("Please set the environment variables MONGO_URI, MONGO_USERNAME, and MONGO_PASSWORD");
+    process.exit(1);
+}
+mongoose.connect(process.env.MONGO_URI, {       
     user: process.env.MONGO_USERNAME,
     pass: process.env.MONGO_PASSWORD,
     useNewUrlParser: true,
