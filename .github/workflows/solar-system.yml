@@ -6,27 +6,24 @@ on:
     branches:
       - main
       - 'feature/*'
-env:
-  MONGO_URI: "mongodb+srv://${{vars.MONGO_USERNAME}}:${{secrets.MONGO_PASSWORD}}@cluster1.enjitsy.mongodb.net/superData"
-  MONGO_USERNAME: ${{vars.MONGO_USERNAME}}
-  MONGO_PASSWORD: ${{secrets.MONGO_PASSWORD}}
+
 jobs:
+  unit-testing:
+    name: Unit Testing
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-    unit-testing:
-        name: Unit Testing
-        runs-on: ubuntu-latest
-        steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v4
+    - name: Setup NodeJS Version
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
 
-        - name: Setup NodeJS Version
-          uses: actions/setup-node@v3
-          with:
-            node-version: 20
-    
-        - name: Install Dependencies
-          run: npm install
-    
-        - name: Unit Testing
-          run: npm test
-          
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Run Unit Tests
+      env:
+        MONGO_URI: "mongodb+srv://${{vars.MONGO_USERNAME}}:${{secrets.MONGO_PASSWORD}}@cluster1.enjitsy.mongodb.net/superData"
+      run: npm test
