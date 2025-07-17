@@ -30,3 +30,4 @@ jobs:
       run: |
          echo "Debug MONGO_URI (password obfuscated): mongodb+srv://${{vars.MONGO_USERNAME}}:***@cluster1.enjitsy.mongodb.net/superData?retryWrites=true&w=majority&appName=Cluster1"
          npm test
+ 
