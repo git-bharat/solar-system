@@ -6,8 +6,12 @@ on:
     branches:
       - main
       - 'feature/*'
-    
+env:
+  MONGO_URL: mongodb+srv://${{secrets.MONGO_PASSWORD}}:${{var.MONGO_USERNAME}}@cluster1.enjitsy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1
+  MONGO_USERNAME: ${{var.MONGO_USERNAME}}
+  MONGO_PASSWORD: ${{secrets.MONGO_PASSWORD}}
 jobs:
+
     unit-testing:
         name: Unit Testing
         runs-on: ubuntu-latest
