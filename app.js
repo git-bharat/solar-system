@@ -4,27 +4,35 @@ const OS = require('os');
 const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
 const app = express();
-const cors = require('cors')
+const cors = require('cors');
 
-
+// Middleware setup
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '/')));
-app.use(cors())
+app.use(cors());
 
+// MongoDB Connection
+// Use async/await or Promises for Mongoose connection for better error handling
 mongoose.connect(process.env.MONGO_URI, {
-    // Remove user and pass options, as they are included in the SRV URI
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}, function(err) {
-    if (err) {
-        console.error("MongoDB Connection Error: ", err); // Use console.error for errors
-        // Optionally, exit the process if DB connection is critical
-        // process.exit(1); 
-    } else {
-       console.log("MongoDB Connection Successful");
-    }
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    // Add server selection timeout to fail faster if connection cannot be established
+    serverSelectionTimeoutMS: 5000 // 5 seconds
+})
+.then(() => {
+    console.log("MongoDB Connection Successful");
+    // Only start the server if MongoDB connection is successful
+    app.listen(3000, () => {
+        console.log("Server successfully running on port - " + 3000);
+    });
+})
+.catch(err => {
+    console.error("MongoDB Connection Error:", err);
+    // Exit the process if a critical database connection fails
+    process.exit(1); 
 });
 
+// Mongoose Schema and Model
 var Schema = mongoose.Schema;
 
 var dataSchema = new Schema({
@@ -37,52 +45,55 @@ var dataSchema = new Schema({
 });
 var planetModel = mongoose.model('planets', dataSchema);
 
+// API Routes
+app.post('/planet', function(req, res) {
+    // Check if MongoDB is connected before querying
+    if (mongoose.connection.readyState !== 1) {
+        console.error("Database not connected when /planet was called.");
+        return res.status(503).send("Database not available.");
+    }
 
-
-app.post('/planet',   function(req, res) {
-   // console.log("Received Planet ID " + req.body.id)
     planetModel.findOne({
         id: req.body.id
     }, function(err, planetData) {
         if (err) {
-            alert("Ooops, We only have 9 planets and a sun. Select a number from 0 - 9")
-            res.send("Error in Planet Data")
+            console.error("Error fetching planet data:", err); // Log the actual error
+            // Avoid using alert in server-side code, it's for browser
+            res.status(500).send("Error in Planet Data retrieval. Please try again.");
+        } else if (!planetData) {
+            // Handle case where no planet is found for the given ID
+            res.status(404).send("Planet not found. Select a number from 1 - 8.");
         } else {
             res.send(planetData);
         }
-    })
-})
+    });
+});
 
-app.get('/',   async (req, res) => {
+app.get('/', async (req, res) => {
     res.sendFile(path.join(__dirname, '/', 'index.html'));
 });
 
-
-app.get('/os',   function(req, res) {
+app.get('/os', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
     res.send({
         "os": OS.hostname(),
         "env": process.env.NODE_ENV
     });
-})
+});
 
-app.get('/live',   function(req, res) {
+app.get('/live', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
     res.send({
         "status": "live"
     });
-})
+});
 
-app.get('/ready',   function(req, res) {
+app.get('/ready', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
     res.send({
         "status": "ready"
     });
-})
+});
 
-app.listen(3000, () => {
-    console.log("Server successfully running on port - " +3000);
-})
-
-
+// Export the app for testing
 module.exports = app;
