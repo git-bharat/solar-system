@@ -7,7 +7,7 @@ on:
       - main
       - 'feature/*'
 env:
-  MONGO_URL: 'mongodb+srv://bharatbhusan051991:JT7N89txxThMnNlb@cluster1.enjitsy.mongodb.net/superData'
+  MONGO_URL: "mongodb+srv://bharatbhusan051991:JT7N89txxThMnNlb@cluster1.enjitsy.mongodb.net/superData"
   MONGO_USERNAME: ${{vars.MONGO_USERNAME}}
   MONGO_PASSWORD: ${{secrets.MONGO_PASSWORD}}
 jobs:
