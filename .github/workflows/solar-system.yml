@@ -25,7 +25,8 @@ jobs:
 
     - name: Run Unit Tests
       env:
-        MONGO_URI: "mongodb+srv://${{vars.MONGO_USERNAME}}:${{secrets.MONGO_PASSWORD}}@cluster1.enjitsy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1" # Use the exact string you received from Atlas
+     # Ensure MONGO_USERNAME and MONGO_PASSWORD are correct and replace <db_password>
+        MONGO_URI: "mongodb+srv://${{vars.MONGO_USERNAME}}:${{secrets.MONGO_PASSWORD}}@cluster1.enjitsy.mongodb.net/superData?retryWrites=true&w=majority&appName=Cluster1"
       run: |
-        echo "Debug MONGO_URI (password obfuscated): mongodb+srv://${{vars.MONGO_USERNAME}}:***@cluster1.enjitsy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1"
-        npm test
+         echo "Debug MONGO_URI (password obfuscated): mongodb+srv://${{vars.MONGO_USERNAME}}:***@cluster1.enjitsy.mongodb.net/superData?retryWrites=true&w=majority&appName=Cluster1"
+         npm test
